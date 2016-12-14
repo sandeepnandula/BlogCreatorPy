@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <link rel="stylesheet" type="text/css" href="/css/welcome.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/js/base.js"></script>
+
+</head>
+<body>
+<div class="container well glyphicon-resize-horizontal ">
+    <div class="col-sm-6">
+        <h1 id="test">Welcome &nbsp;&nbsp;&nbsp;{{userName}}</h1>
+        {% if userName == "" %}
+        <button class="btn btn-success" onclick="location.href='signup'">signup</button>
+        <button class="btn btn-success" onclick="location.href='login'">login</button>
+        {% else %}
+        <button class="btn btn-success"  onclick="location.href='logout'">Logout</button>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
