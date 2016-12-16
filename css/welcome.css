@@ -1,3 +1,41 @@
-#test{
-    color:crimson;
-}ds
+body{
+    background-image: url(/css/bg.jpg);
+    background-size:cover;
+    background-repeat:no-repeat
+}
+#blogcontent{
+    background-image:url(/css/bg3.jpg);
+    background-size:cover;
+    width:100%;
+    height:100vh;
+color:white;
+font-size:x-large;
+position:fixed;
+
+}
+.heading{
+position:fixed;
+top:30%;
+left:10%;
+font-size:80px;
+color:white;
+
+}
+.buttons{
+position:fixed;
+top:53%;
+left:11%;
+}
+.btn{
+    width:150px;
+}
+.panel{
+position:fixed;
+top:10%;
+right:7%;
+width:440px;
+height:50px;
+text-align:center;
+padding:11px;
+
+}

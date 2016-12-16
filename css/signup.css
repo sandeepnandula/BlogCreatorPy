@@ -1,0 +1,20 @@
+body{
+    background-image: url(/css/bg2.jpg);
+    background-size:cover;
+    background-repeat:no-repeat
+}
+.form-group{
+    box-shadow: 1px 1px 52px black;
+    margin:5% 37.5%;
+    font-size:x-large;
+    color:white;
+    padding:10px;
+
+
+}
+.btn {
+    font-family:cursive;
+
+
+
+}

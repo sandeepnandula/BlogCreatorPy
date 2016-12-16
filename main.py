@@ -16,13 +16,16 @@
 #
 import hashlib
 import webapp2
+import random
+import string
 import os
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 signupPath = os.path.join(os.path.dirname(__file__), 'signupform.html')
 loginPath = os.path.join(os.path.dirname(__file__), 'loginform.html')
 welcomePath = os.path.join(os.path.dirname(__file__), 'welcome.html')
+blogviewpath = os.path.join(os.path.dirname(__file__), 'BlogView.html')
 
 
 class Handler(webapp2.RequestHandler):
@@ -35,34 +38,71 @@ class Handler(webapp2.RequestHandler):
     def Hash_Pass(self, userpassword):
         return hashlib.md5(userpassword).hexdigest()
 
+    def random_generator(self):
+        return ''.join([random.choice(string.ascii_uppercase + string.digits) for x in range(6)])
 
-class UserDetails(db.Model):
-    USERNAME = db.StringProperty(required=True)
-    PASSWORD = db.StringProperty(required=True)
-    EMAILID = db.StringProperty(required=True)
-    CREATED = db.DateTimeProperty(auto_now_add=True)
+
+class UserDetails(ndb.Model):
+    USERNAME = ndb.StringProperty(required=True)
+    PASSWORD = ndb.StringProperty(required=True)
+    EMAILID = ndb.StringProperty(required=True)
+    CREATED = ndb.DateTimeProperty(auto_now_add=True)
     # this function handles the creation of the datastore kind and entities etc..,
+
+
+class Cookies(ndb.Model):
+    USER = ndb.StringProperty(required=True)
+    COOKIE = ndb.StringProperty(required=True)
+
+
+class UserBlogDetails(ndb.Model):
+    USERNAME = ndb.StringProperty(required=True)
+    TITILE = ndb.StringProperty(required=True)
+    HEADING = ndb.StringProperty(required=True)
+    DISCRIPTION = ndb.StringProperty(required=True)
+    CREATED = ndb.DateTimeProperty(auto_now_add=True)
 
 
 class MainPage(Handler):
     def get(self):
-        userName = self.request.cookies.get('user', "")
-        template_value = {"userName": userName}
-        self.write(template.render(welcomePath, template_value))
+        blogcontent = UserBlogDetails.query().order(-ndb.DateTimeProperty('CREATED'))
+        cookie = self.request.cookies.get('user', "")
+
+        if (cookie == ""):
+            template_value = {"userName": "",
+                              "blogcontent": blogcontent
+                              }
+            self.write(template.render(welcomePath, template_value))
+
+        else:
+            user = Cookies.query(Cookies.COOKIE == cookie).get()
+
+            template_value = {"userName": str(user.USER),
+                              "blogcontent": blogcontent
+                              }
+            self.write(template.render(welcomePath, template_value))
+
+
+            #
+            # def post(self):
+            #     blogcontents = UserBlogDetails.query().order(-ndb.DateTimeProperty('CREATED'))
+            #     for blogcontent in blogcontents:
+            #         self.response.out.write(
+            #             '<button>View</button><h>Title: %s</h> &nbsp;&nbsp; <h>UserName: %s</h><br><hr> ' % (
+            #                 blogcontent.TITILE, blogcontent.USERNAME))
 
 
 class Logout(Handler):
     def get(self):
         self.response.delete_cookie('user')
-        # self.response.headers.add_header('Set-Cookie', 'user=')
         self.redirect('/')
 
 
 class Login(Handler):
     # This function will handles the login protocol deeds
-    def get(self):
-        template_value = {"error": ""}
-        self.write(template.render(loginPath, template_value))
+    # def get(self):
+    #     template_value = {"error": ""}
+    #     self.write(template.render(loginPath, template_value))
 
     def post(self):
         userName = self.request.get("userName")
@@ -70,25 +110,30 @@ class Login(Handler):
         password = self.Hash_Pass(userPassword)
 
         if (userName and userPassword):
-            q = UserDetails.all().filter('USERNAME =', userName).get()
-            if (q.USERNAME == userName and q.PASSWORD == password):
-                self.response.headers.add_header('Set-Cookie', '%s=%s' % ("user", str(userName)))
-                self.redirect('/')
-
+            # q = UserDetails.query(ndb.StringProperty('USERNAME ')== userName)
+            # q= UserDetails.get_by_id(userName)
+            if UserDetails.query(UserDetails.USERNAME == userName).get():
+                user = UserDetails.query(UserDetails.USERNAME == userName).get()
+                u = Cookies.query(Cookies.USER == userName).get()
+                if user.PASSWORD == password:
+                    self.response.headers.add_header('Set-Cookie', '%s=%s' % ("user", str(u.COOKIE)))
+                else:
+                    self.response.out.write("Invalid username or password")
             else:
-                template_value = {
-                    "error": "Invalid details",
-                    "name": userName,
-                    "password": "",
-                }
-                self.write(template.render(loginPath, template_value))
+                # template_value = {
+                #     "error": "Invalid details",
+                #     "name": userName,
+                #     "password": "",
+                # }
+                self.response.out.write("Invalid user details")
         else:
-            template_value = {
-                "error": "Please fill the details",
-                "name": userName,
-                "password": "",
-                "emailId": ""}
-            self.write(template.render(loginPath, template_value))
+            # template_value = {
+            #     "error": "Please fill the details",
+            #     "name": userName,
+            #     "password": "",
+            #     "emailId": ""}
+            # self.write(template.render(loginPath, template_value))
+            self.response.out.write("please fill the fields")
 
 
 class Signup(Handler):
@@ -100,23 +145,79 @@ class Signup(Handler):
         userName = self.request.get("username")
         userPassword = self.request.get("password")
         emailId = self.request.get("emailId")
-
         password = self.Hash_Pass(userPassword)
+        secure = self.random_generator()
 
         if (userName and password and emailId):
-            userDetails = UserDetails(USERNAME=userName, PASSWORD=password, EMAILID=emailId, key_name=userName)
-            userDetails.put()
 
-            self.redirect('/')
+            if (UserDetails.query().filter(UserDetails.USERNAME == userName).get()):
+                template_value = {
+                    "error": "username already exist",
+                    "name": "",
+                    "password": "",
+                    "emailId": emailId
+                }
+                self.write(template.render(signupPath, template_value))
+            else:
+                secure = self.Hash_Pass(self.random_generator())
+                Cookie = Cookies(USER=userName, COOKIE=secure)
+                Cookie.put()
+                userDetails = UserDetails(USERNAME=userName, PASSWORD=password, EMAILID=emailId, id=secure)
+                userDetails.put()
+                self.redirect('/')
         else:
             template_value = {
-                "error": "plz fil",
+                "error": "please fill all the fields",
                 "name": userName,
-                "password": password,
+                "password": "",
                 "emailId": emailId
             }
             self.write(template.render(signupPath, template_value))
 
 
-app = webapp2.WSGIApplication([('/', MainPage), ('/login', Login), ('/signup', Signup), ('/logout', Logout)],
-                              debug=True)
+class BlogCreation(Handler):
+    def get(self):
+        title = self.request.get("title")
+        heading = self.request.get("heading")
+        discription = self.request.get("discription")
+        if (title and heading and discription):
+            cookie = self.request.cookies.get('user', "")
+            user = Cookies.query(Cookies.COOKIE == cookie).get()
+            userBlogForm = UserBlogDetails(TITILE=title, HEADING=heading, DISCRIPTION=discription,
+                                           USERNAME=str(user.USER))
+            userBlogForm.put()
+            self.response.out.write("blog has created")
+        else:
+            self.response.out.write("Please fill the all the fields")
+
+
+class BlogContent(Handler):
+    def post(self):
+        title = self.request.get("title")
+        user = self.request.get("user")
+        q = UserBlogDetails.query(UserBlogDetails.TITILE == title and UserBlogDetails.USERNAME == user).get()
+        c = list(str(q.CREATED))
+        template_value = {"title": str(q.TITILE),
+                          "heading": str(q.HEADING),
+                          "discription": str(q.DISCRIPTION),
+                          "username": str(q.USERNAME),
+                          "created": ''.join(c[0:16])
+                          }
+        self.response.out.write(template.render(blogviewpath, template_value))
+
+
+
+        # self.response.out.write(template_value)
+
+
+app = webapp2.WSGIApplication(
+    [('/', MainPage), ('/login', Login), ('/signup', Signup), ('/logout', Logout), ('/blogcreation', BlogCreation),
+     ('/blogcontent', BlogContent)],
+    debug=True)
+
+
+# for blogcontent in blogcontents.iter( ):
+# it to iterate the perticular proper
+#      test = ""+ str(blogcontent)
+# blogcontents = UserBlogDetails.query().fetch() it is used to get the complete kind from the data store
+# blogcontents = UserBlogDetails.query().order(ndb.DateTimeProperty('CREATED')) it is used to create an ordered list
