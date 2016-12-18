@@ -1,4 +1,4 @@
-application: Blogcreator
+application: blogpy-152910
 version: 1
 runtime: python27
 api_version: 1
