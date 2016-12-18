@@ -14,19 +14,16 @@
     </script>
     <script>
       $(document).ready( function(){
-      var delay=3000;
-var delay=1000; //1 second
-$(".onoffswitch").click(function(){
-setTimeout(function() {
-  history.go(0);
-}, delay);
+         var delay=2000;
+        var delay=1000; //1 second
+        $(".onoffswitch").click(function(){
+            setTimeout(function() {
+             history.go(0);
+            }, delay);
+          });
+     });
 
 
-
-      });
-
-
- });
 
 
     </script>
@@ -45,12 +42,13 @@ setTimeout(function() {
     <label>UserName:&nbsp;&nbsp;{{username}}</label><br>
     <span class="glyphicon glyphicon-time"></span><br>
     <label>Created:&nbsp;&nbsp;{{created}}</label>
+    {{id}}
 </div>
 <div id="blogcontents">
-    <label for="title" style=" font-size: -webkit-xxx-large;">Title:</label>&nbsp;&nbsp;Jai<br>
-    <label for="heading" style="font-size: 34px;">Heading:</label>&nbsp;&nbsp;hi <br>
-    <label for="discription" style="font-size: 28px;">Discription:</label><br>
-    hello
+    <label for="title" style=" font-size: -webkit-xxx-large;">Title:</label>&nbsp;&nbsp;{{title}}<br>
+    <label for="heading" style="font-size: 34px;">Heading:</label>&nbsp;&nbsp;{{heading}} <br>
+    <label for="discription" style="font-size: 28px;">Discription:</label>{{discription}}<br>
+
 </div>
 
 

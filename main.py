@@ -19,6 +19,7 @@ import webapp2
 import random
 import string
 import os
+import json
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -47,6 +48,7 @@ class UserDetails(ndb.Model):
     PASSWORD = ndb.StringProperty(required=True)
     EMAILID = ndb.StringProperty(required=True)
     CREATED = ndb.DateTimeProperty(auto_now_add=True)
+
     # this function handles the creation of the datastore kind and entities etc..,
 
 
@@ -186,7 +188,6 @@ class BlogCreation(Handler):
             userBlogForm = UserBlogDetails(TITILE=title, HEADING=heading, DISCRIPTION=discription,
                                            USERNAME=str(user.USER))
             userBlogForm.put()
-            self.response.out.write("blog has created")
         else:
             self.response.out.write("Please fill the all the fields")
 
@@ -195,24 +196,49 @@ class BlogContent(Handler):
     def post(self):
         title = self.request.get("title")
         user = self.request.get("user")
-        q = UserBlogDetails.query(UserBlogDetails.TITILE == title and UserBlogDetails.USERNAME == user).get()
+        id = self.request.get("id")
+
+        q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
         c = list(str(q.CREATED))
         template_value = {"title": str(q.TITILE),
                           "heading": str(q.HEADING),
                           "discription": str(q.DISCRIPTION),
                           "username": str(q.USERNAME),
+                          "id": ''.join(id[23:-1]),
                           "created": ''.join(c[0:16])
                           }
         self.response.out.write(template.render(blogviewpath, template_value))
 
 
+class DeleteBlog(Handler):
+    def post(self):
+        key = str(self.request.get("id"))
+        title = self.request.get("title")
+        q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
 
-        # self.response.out.write(template_value)
+        # q.key.delete()
+        t = list(str(q.key))
+        if ((''.join(t[23:-1])) == key):
+            q.key.delete()
+            self.response.out.write("Successfully deleted!")
+
+
+class BlogEdit(Handler):
+    def get(self):
+        template_values = {
+            "error": "please fill all the fields",
+            "name": "hi",
+            "password": "jldfakj",
+            "emailId": "heml"
+        }
+        # json.dumps is used to convert the python dictionary objects to json objects
+        test = json.dumps(template_values)
+        self.response.out.write(test)
 
 
 app = webapp2.WSGIApplication(
     [('/', MainPage), ('/login', Login), ('/signup', Signup), ('/logout', Logout), ('/blogcreation', BlogCreation),
-     ('/blogcontent', BlogContent)],
+     ('/blogcontent', BlogContent), ('/deleteblog', DeleteBlog),('/blogedit', BlogEdit)],
     debug=True)
 
 
