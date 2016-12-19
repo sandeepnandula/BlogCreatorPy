@@ -83,8 +83,6 @@ class MainPage(Handler):
                               "blogcontent": blogcontent
                               }
             self.write(template.render(welcomePath, template_value))
-
-
             #
             # def post(self):
             #     blogcontents = UserBlogDetails.query().order(-ndb.DateTimeProperty('CREATED'))
@@ -215,7 +213,6 @@ class DeleteBlog(Handler):
         key = str(self.request.get("id"))
         title = self.request.get("title")
         q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
-
         # q.key.delete()
         t = list(str(q.key))
         if ((''.join(t[23:-1])) == key):
@@ -225,15 +222,30 @@ class DeleteBlog(Handler):
 
 class BlogEdit(Handler):
     def get(self):
-        template_values = {
-            "error": "please fill all the fields",
-            "name": "hi",
-            "password": "jldfakj",
-            "emailId": "heml"
-        }
+        title = self.request.get("title")
+        q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
+        c = list(str(q.CREATED))
+        template_values = {"title": str(q.TITILE),
+                          "heading": str(q.HEADING),
+                          "discription": str(q.DISCRIPTION),
+                          }
         # json.dumps is used to convert the python dictionary objects to json objects
         test = json.dumps(template_values)
         self.response.out.write(test)
+
+    def post(self):
+        title = self.request.get("title")
+        etitle = self.request.get("etitle")
+        eheading = self.request.get("eheading")
+        ediscription = self.request.get("ediscription")
+        if (etitle and eheading and ediscription):
+            q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
+            q.TITILE = etitle
+            q.HEADING= eheading
+            q.DISCRIPTION = ediscription
+            q.put()
+        else:
+            self.response.out.write("Please fill the all the fields")
 
 
 app = webapp2.WSGIApplication(

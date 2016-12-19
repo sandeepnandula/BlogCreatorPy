@@ -54,61 +54,72 @@ $("#login").click(function() {
      var user = $(this).attr('value');
      var id = $(this).attr('name');
      console.log(title1 + id)
-     $.post("blogcontent",{
-            "title":title1,
-            "user":user,
-            "id":id
-     },function(result){
-     console.log("result is " + result)
-     $("#mainpage").hide()
-     $("#blogcontent").html(result).show()
+     $.post("blogcontent", {
+         "title": title1,
+         "user": user,
+         "id": id
+     }, function(result) {
+         console.log("result is " + result)
+         $("#mainpage").hide()
+         $("#blogcontent").html(result).show()
      });
 
  });
 
 
-     $(".delete").click(function(){
-      var id = $(this).attr('name');
-      var title = $(this).attr('value');
-      console.log("on delete mode")
-      $(".delete_yes").one("click",function(){
-             $.post("deleteblog",{
-                    "id":id,
-                    "title":title
-              },function(result){
-              console.log("result is " + result)
-              history.go(0);
-                  });
-      });
-});
+ $(".delete").click(function() {
+     var id = $(this).attr('name');
+     var title = $(this).attr('value');
+     console.log("on delete mode")
+     $(".delete_yes").one("click", function() {
+         $.post("deleteblog", {
+             "id": id,
+             "title": title
+         }, function(result) {
+             console.log("result is " + result)
+             history.go(0);
+         });
+     });
+ });
 
   $(".edit").click(function() {
-      var id = $(this).attr('name');
-     console.log(id)
-     $.getJSON("blogedit", function(result){
-        console.log(result)
-        $('[name=title]').val("hi")
-        $('[name=heading]').val("hi")
-        $('[name=discription]').val("hi")
+     var title = $(this).attr('value');
+     var s = []
+     $.getJSON("blogedit", {
+         "title": title
+     }, function(result) {
+         console.log("editing is on process")
+         $.each(result, function(i, field) { //     for each function in the javascript to print the jason by each value and key
+             s.push(field); //        below code is used to add elements to the arry lists
+             console.log(field)
 
-//     for each function in the javascript to print the jason by each value and key
-//        $.each(result, function(i, field){
-//            console.log(i + ":" + field )
-//        });
+         });
 
-    });
-//     $.post("blogedit",{
-//
-//     },function(result){
-//     var test= result
-//     console.log("result is " + test[0])
-//
-//     });
+         console.log(s)
+         $('[name=etitle]').val(s[0]);
+         $('[name=eheading]').val(s[1]);
+         $('[name=ediscription]').val(s[2]);
 
+     });
+
+
+     $("#updateblog").click(function() {
+         var etitle = $('[name=etitle]').val();
+         var eheading = $('[name=eheading]').val();
+         var ediscription = $('[name=ediscription]').val();
+         console.log("updating...")
+         $.post("blogedit", {
+             "title": title,
+             "etitle": etitle,
+             "eheading": eheading,
+             "ediscription": ediscription
+         }, function(result) {
+             console.log("updated")
+             history.go(0);
+         });
+
+     });
  });
-//${"#deleteblog"}.click(function(){
-//console.log("delete button is clicking")
-//
-//});
+
 
 });
