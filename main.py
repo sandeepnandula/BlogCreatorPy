@@ -191,12 +191,8 @@ class BlogCreation(Handler):
 
 
 class BlogContent(Handler):
-    def post(self):
-        title = self.request.get("title")
-        user = self.request.get("user")
-        id = self.request.get("id")
-
-        q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
+    def get(self, id):
+        q = UserBlogDetails.get_by_id(int(id))
         c = list(str(q.CREATED))
         template_value = {"title": str(q.TITILE),
                           "heading": str(q.HEADING),
@@ -205,52 +201,71 @@ class BlogContent(Handler):
                           "id": ''.join(id[23:-1]),
                           "created": ''.join(c[0:16])
                           }
-        self.response.out.write(template.render(blogviewpath, template_value))
+        self.write(template.render(blogviewpath, template_value))
 
 
 class DeleteBlog(Handler):
     def post(self):
-        key = str(self.request.get("id"))
-        title = self.request.get("title")
-        q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
+        id = self.request.get("id")
+        q = UserBlogDetails.get_by_id(int(id))
         # q.key.delete()
-        t = list(str(q.key))
-        if ((''.join(t[23:-1])) == key):
-            q.key.delete()
-            self.response.out.write("Successfully deleted!")
+        q.key.delete()
+        self.response.out.write("Successfully deleted!")
 
 
 class BlogEdit(Handler):
-    def get(self):
-        title = self.request.get("title")
-        q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
+    def get(self, id):
+        q = UserBlogDetails.get_by_id(int(id))
         c = list(str(q.CREATED))
-        template_values = {"title": str(q.TITILE),
-                          "heading": str(q.HEADING),
-                          "discription": str(q.DISCRIPTION),
+        template_value = {"etitle": str(q.TITILE),
+                          "eheading": str(q.HEADING),
+                          "ediscription": str(q.DISCRIPTION),
+                          "username": str(q.USERNAME),
+                          "created": ''.join(c[0:16]),
+                          "id": id
                           }
-        # json.dumps is used to convert the python dictionary objects to json objects
-        test = json.dumps(template_values)
-        self.response.out.write(test)
+        self.write(template.render(blogviewpath, template_value))
 
-    def post(self):
-        title = self.request.get("title")
+    def post(self, id):
         etitle = self.request.get("etitle")
         eheading = self.request.get("eheading")
         ediscription = self.request.get("ediscription")
-        if (etitle and eheading and ediscription):
-            q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
-            q.TITILE = etitle
-            q.HEADING= eheading
-            q.DISCRIPTION = ediscription
-            q.put()
-        else:
-            self.response.out.write("Please fill the all the fields")
+        q = UserBlogDetails.get_by_id(int(id))
+        q.TITILE = etitle
+        q.HEADING = eheading
+        q.DISCRIPTION = ediscription
+        q.put()
+        self.redirect('/')
+
+
+
+        # c = list(str(q.CREATED))
+        # template_values = {"title": str(q.TITILE),
+        #                    "heading": str(q.HEADING),
+        #                    "discription": str(q.DISCRIPTION),
+        #                    }
+        # # json.dumps is used to convert the python dictionary objects to json objects
+        # test = json.dumps(template_values)
+        # self.response.out.write("editing is working")
+
+        # def post(self):
+        #     title = self.request.get("title")
+        #     etitle = self.request.get("etitle")
+        #     eheading = self.request.get("eheading")
+        #     ediscription = self.request.get("ediscription")
+        #     if (etitle and eheading and ediscription):
+        #         q = UserBlogDetails.query(UserBlogDetails.TITILE == title).get()
+        #         q.TITILE = etitle
+        #         q.HEADING = eheading
+        #         q.DISCRIPTION = ediscription
+        #         q.put()
+        #     else:
+        #         self.response.out.write("Please fill the all the fields")
 
 
 app = webapp2.WSGIApplication(
     [('/', MainPage), ('/login', Login), ('/signup', Signup), ('/logout', Logout), ('/blogcreation', BlogCreation),
-     ('/blogcontent', BlogContent), ('/deleteblog', DeleteBlog),('/blogedit', BlogEdit)],
+     ('/blogcontent/(\d+)', BlogContent), ('/deleteblog', DeleteBlog), ('/blogedit/(\d+)', BlogEdit)],
     debug=True)
 
 

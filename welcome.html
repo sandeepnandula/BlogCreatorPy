@@ -16,13 +16,13 @@
 <body style="width=100%; height:100%">
 	<div id="mainpage" style="width=100%; height:100%">
 		<div class="container-fluid" id="bg" style="width=100%; height:100%">
-			<h1 class="heading">Welcome &nbsp;&nbsp;&nbsp; {{userName}}</h1>{% if userName == "" %}
+			<h1 class="heading">Welcome &nbsp; {{userName}}</h1>{% if userName == "" %}
 			<div class="buttons">
 				<button class="btn btn-primary" onclick="location.href='signup'"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;signup</button>
                 <button class="btn btn-success" id="loginmodal"><span class="glyphicon glyphicon-log-in"></span>&nbsp;&nbsp;login</button>
 			</div>
             {% else %}
-            <button class="btn btn-success" data-target="#blogform" data-toggle="modal" style=" position: fixed; left: 17%; top: 59%; background-color: #e84c3d; border: 7px solid #3d3d3d; width: 291px; font-family: cursive; font-size: 20px;">Click here to Create a blog</button>
+            <button class="btn btn-success" data-target="#blogform" data-toggle="modal" style=" position: fixed; left: 58%; top: 1%; background-color: #e84c3d; border: 7px solid #3d3d3d; width: 291px; font-family: cursive; font-size: 20px;">Click here to Create a blog</button>
             <button class="btn btn-warning" onclick="location.href='logout'" style=" position: fixed; left: 87%; top: 3%;">Logout</button>
             {% endif %}
             <!--blog creation form html code mentioned below-->
@@ -63,18 +63,20 @@
 				</div>
 			</div>
             <!--bloglist panel-->
-			<div class=" panel panel-success" style="background-color: #e84c3d; border: none;">
+			<div class=" panel panel-success " style="background-color: #e84c3d; border: none;">
 				<div class="panel-heading" style="background-color: #3d3d3d;color: white;border: none;">
-					<h4 class="panel-title"><a data-toggle="collapse" href="#collapse1"><u>Click to See CreatedBlogs</u></a></h4>
+					<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse1"><u>CreatedBlogs</u></a></h4>
 				</div>
-				<div class="panel-collapse collapse list-group" id="collapse1">
+				<div class="panel-collapse list-group" id="collapse1">
 					{%for blogdetails in blogcontent%}
 					<div class="panel-body list-group-item">
 						<div class="btn-group">
-							<button class="view btn btn-success" id="{{blogdetails.TITILE}}" name="{{blogdetails.key.id}}" style="width: 75px;" value="{{blogdetails.USERNAME}}">View</button>
-                            {% if userName == blogdetails.USERNAME %}
-                            <button class="edit btn btn-default" data-target="#editblogform" data-toggle="modal" name="{{blogdetails.key.id}}" style="width: 75px;" value="{{blogdetails.TITILE}}">Edit</button>
-                            <button class="delete btn btn-danger" data-target="#deletemodal" data-toggle="modal" name="{{blogdetails.key.id}}" style="width: 75px;" value="{{blogdetails.TITILE}}">Delete</button>
+
+							<button class="view btn btn-success" onclick="location.href='blogcontent/{{blogdetails.key.id}}'" value="{{blogdetails.key.id}}" style="width: 75px;" >View</button>
+
+                                {% if userName == blogdetails.USERNAME %}
+                            <button class="edit btn btn-default"  data-toggle="modal"  style="width: 75px;" onclick="location.href='blogedit/{{blogdetails.key.id}}'" >Edit</button>
+                            <button class="delete btn btn-danger" data-target="#deletemodal" data-toggle="modal"  style="width: 75px;" value="{{blogdetails.key.id}}">Delete</button>
                             {%endif%}
 						</div><br>
 						<table>
@@ -87,37 +89,19 @@
 				</div>
 			</div>
             <!--edit blogfrom code goes from here..-->
-			<div class="modal fade" id="editblogform" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button class="close" data-dismiss="modal" type="button">&times;</button>
-							<h4 class="modal-title">BlogCreationForm</h4>
-						</div>
-						<div class="modal-body">
-							<br>
-							<label for=" etitle">Title</label>
-                            <input class="form-control" name="etitle" placeholder="Enter Your Blog Title" type="text" value="{{title|escape}}">
-                            <label for="heading">Heading</label>
-                            <input class="form-control" name="eheading" placeholder="Enter Your Blog Heading" type="text" value="{{heading|escape}}">
-                            <label for="discription">Description</label>
-							<textarea class="form-control" name="ediscription" placeholder=" Enter Your Description Here...." rows="6"></textarea>
-                            <button class="btn btn-default" id="updateblog">Update</button>
-						</div>
-					</div>
-				</div>
-			</div>
+
             <!--delete alert modal code goes below-->
 			<div class="modal fade" id="deletemodal" role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-footer" style="text-align: center; border: none;">
 						<h2 style="color:red;">Do you want to delete the Blog ?</h2><br>
-						<button class="delete_yes btn btn-success" data-dismiss="modal" style="width: 75px;" type="button">Yes</button> <button class="btn btn-danger" data-dismiss="modal" style="width: 75px;" type="button">No</button>
+						<button class="delete_yes btn btn-success" data-dismiss="modal" style="width: 75px;" type="button">Yes</button>
+                        <button class="btn btn-danger" data-dismiss="modal" style="width: 75px;" type="button">No</button>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div id="blogcontent" style="width=100%;"></div>
+
 </body>
 </html>

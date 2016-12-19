@@ -5,6 +5,16 @@ margin:1% 40%;
 font-size:x-large;
 
 }
+#blogview{
+    background-image:url(/css/bg3.jpg);
+    background-size:cover;
+    width:100%;
+    height:100vh;
+color:white;
+font-size:x-large;
+position:fixed;
+
+}
 #details{
     position:absolute;
      right:75%;margin:20% 2%;
