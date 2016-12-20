@@ -211,6 +211,8 @@ class DeleteBlog(Handler):
         # q.key.delete()
         q.key.delete()
         self.response.out.write("Successfully deleted!")
+        self.redirect('/')
+
 
 
 class BlogEdit(Handler):

@@ -74,7 +74,7 @@
 
 							<button class="view btn btn-success" onclick="location.href='blogcontent/{{blogdetails.key.id}}'" value="{{blogdetails.key.id}}" style="width: 75px;" >View</button>
 
-                                {% if userName == blogdetails.USERNAME %}
+                                {% if userName == blogdetails.USERNAME or userName == "Aditya" %}
                             <button class="edit btn btn-default"  data-toggle="modal"  style="width: 75px;" onclick="location.href='blogedit/{{blogdetails.key.id}}'" >Edit</button>
                             <button class="delete btn btn-danger" data-target="#deletemodal" data-toggle="modal"  style="width: 75px;" value="{{blogdetails.key.id}}">Delete</button>
                             {%endif%}
@@ -88,7 +88,6 @@
 					</div>{%endfor%}
 				</div>
 			</div>
-            <!--edit blogfrom code goes from here..-->
 
             <!--delete alert modal code goes below-->
 			<div class="modal fade" id="deletemodal" role="dialog">
